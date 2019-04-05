@@ -32,16 +32,7 @@ public class BankController {
 	public Result saveMoney(@PathVariable int userId, @PathVariable BigDecimal money) {
 
 		Result result = null;
-		try {
-			lock.lock();
-			result = bankService.saveMoney(userId, money);
-		} catch (Exception e) {
-
-			result = ResultBuilder.buildByException(e);
-		} finally {
-
-			lock.unlock();
-		}
+		result = bankService.saveMoney(userId, money);
 
 		return result;
 	}
@@ -50,16 +41,7 @@ public class BankController {
 	public Result getMoney(@PathVariable int userId, @PathVariable BigDecimal money) {
 
 		Result result = null;
-		try {
-			lock.lock();
-			result = bankService.getMoney(userId, money);
-		} catch (Exception e) {
-
-			result = ResultBuilder.buildByException(e);
-		} finally {
-
-			lock.unlock();
-		}
+		result = bankService.getMoney(userId, money);
 
 		return result;
 	}

@@ -37,16 +37,18 @@ public class BankService {
 			if (isValidUser(userId)) {
 
 				Account account = accountRepo.findByUserId(userId);
-				BigDecimal nowMoney = account.getMoney();
-				account.setMoney(account.getMoney().add(money));
-				accountRepo.saveAndFlush(account);
-				result = ResultBuilder.build(true, nowMoney + " -> " + account.getMoney());
-				AccountRecord ar = new AccountRecord();
-				ar.setId(UuidUtil.uuidWithoutLine());
-				ar.setCreateTime(new Date());
-				ar.setUserId(userId);
-				ar.setMoney(money);
-				aRecordRepo.save(ar);
+				synchronized (account) {
+					BigDecimal nowMoney = account.getMoney();
+					account.setMoney(account.getMoney().add(money));
+					accountRepo.saveAndFlush(account);
+					result = ResultBuilder.build(true, nowMoney + " -> " + account.getMoney());
+					AccountRecord ar = new AccountRecord();
+					ar.setId(UuidUtil.uuidWithoutLine());
+					ar.setCreateTime(new Date());
+					ar.setUserId(userId);
+					ar.setMoney(money);
+					aRecordRepo.save(ar);
+				}
 			} else
 				result = ResultBuilder.build(false, "user is invalid");
 		} catch (Exception e) {
@@ -64,23 +66,24 @@ public class BankService {
 			if (isValidUser(userId)) {
 
 				Account account = accountRepo.findByUserId(userId);
-				BigDecimal nowMoney = account.getMoney();
-				if (nowMoney.compareTo(money) < 0) {
+				synchronized (account) {
+					BigDecimal nowMoney = account.getMoney();
+					if (nowMoney.compareTo(money) < 0) {
 
-					result = ResultBuilder.build(false, "do not have enough money");
-				} else {
-					account.setMoney(nowMoney.subtract(money));
-					accountRepo.save(account);
-					result = ResultBuilder.build(true, nowMoney + " -> " + account.getMoney());
+						result = ResultBuilder.build(false, "do not have enough money");
+					} else {
+						account.setMoney(nowMoney.subtract(money));
+						accountRepo.save(account);
+						result = ResultBuilder.build(true, nowMoney + " -> " + account.getMoney());
 
-					AccountRecord ar = new AccountRecord();
-					ar.setId(UuidUtil.uuidWithoutLine());
-					ar.setCreateTime(new Date());
-					ar.setUserId(userId);
-					ar.setMoney(money.negate());
-					aRecordRepo.save(ar);
+						AccountRecord ar = new AccountRecord();
+						ar.setId(UuidUtil.uuidWithoutLine());
+						ar.setCreateTime(new Date());
+						ar.setUserId(userId);
+						ar.setMoney(money.negate());
+						aRecordRepo.save(ar);
+					}
 				}
-
 			} else
 				result = ResultBuilder.build(false, "user is invalid");
 		} catch (Exception e) {
