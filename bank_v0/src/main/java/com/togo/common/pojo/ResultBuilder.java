@@ -44,5 +44,20 @@ public final class ResultBuilder {
 			this.success = success;
 			this.msg = msg;
 		}
+
+		public boolean isSuccess() {
+			return success;
+		}
+
+		public String getMsg() {
+			return msg;
+		}
+
+		@Override
+		public String toString() {
+
+			return "success : " + success + ", msg : " + msg;
+		}
+
 	}
 }
