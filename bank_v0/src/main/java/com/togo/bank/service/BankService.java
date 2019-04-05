@@ -2,8 +2,6 @@ package com.togo.bank.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.concurrent.locks.ReentrantLock;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
