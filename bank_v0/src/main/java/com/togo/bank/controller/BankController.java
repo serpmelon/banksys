@@ -1,6 +1,7 @@
 package com.togo.bank.controller;
 
 import java.math.BigDecimal;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,8 @@ public class BankController {
 	@Autowired
 	private BankService bankService;
 
+	private ReentrantLock lock = new ReentrantLock();
+
 	@GetMapping(value = "/test")
 	public Result test() {
 
@@ -28,12 +31,36 @@ public class BankController {
 	@GetMapping(value = "/save/{userId}/{money}")
 	public Result saveMoney(@PathVariable int userId, @PathVariable BigDecimal money) {
 
-		return bankService.saveMoney(userId, money);
+		Result result = null;
+		try {
+			lock.lock();
+			result = bankService.saveMoney(userId, money);
+		} catch (Exception e) {
+
+			result = ResultBuilder.buildByException(e);
+		} finally {
+
+			lock.unlock();
+		}
+
+		return result;
 	}
 
 	@GetMapping(value = "/get/{userId}/{money}")
 	public Result getMoney(@PathVariable int userId, @PathVariable BigDecimal money) {
 
-		return bankService.getMoney(userId, money);
+		Result result = null;
+		try {
+			lock.lock();
+			result = bankService.getMoney(userId, money);
+		} catch (Exception e) {
+
+			result = ResultBuilder.buildByException(e);
+		} finally {
+
+			lock.unlock();
+		}
+
+		return result;
 	}
 }

@@ -2,6 +2,7 @@ package com.togo.bank.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.transaction.Transactional;
 
@@ -38,7 +39,7 @@ public class BankService {
 				Account account = accountRepo.findByUserId(userId);
 				BigDecimal nowMoney = account.getMoney();
 				account.setMoney(account.getMoney().add(money));
-				accountRepo.save(account);
+				accountRepo.saveAndFlush(account);
 				result = ResultBuilder.build(true, nowMoney + " -> " + account.getMoney());
 				AccountRecord ar = new AccountRecord();
 				ar.setId(UuidUtil.uuidWithoutLine());
